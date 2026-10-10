@@ -1,8 +1,11 @@
 /**
  * @name SeasonalMoments
- * @author arikm
+ * @author YarilaFox
  * @description Seasonal particles, winter snow, fireworks, and private holiday cards in chats and calls.
- * @version 0.7.1
+ * @version 0.8.0
+ * @authorLink https://canary.discord.com/channels/@me/657887591634305036
+ * @website https://github.com/YarilaFox/BetterDiscordPlugins/tree/main/SeasonalMoments
+ * @source https://github.com/YarilaFox/BetterDiscordPlugins/blob/main/SeasonalMoments/SeasonalMoments.plugin.js
  */
 
 /* The autumn leaf shape is MIT licensed: Diemen Design, LibreICONS.
@@ -10,7 +13,6 @@
 
 const NAME = "SeasonalMoments";
 const STYLE_ID = "seasonal-moments-style";
-const PREVIEW_THEME_CLASSES = ["theme-light", "theme-dark", "theme-midnight", "theme-darker", "theme-ash", "theme-onyx"];
 const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const MONTHS_RU = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 const MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -48,9 +50,6 @@ const CSS = `
 .sm-nickname-perch.sm-perch-snow{border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}
 .theme-light .sm-nickname-perch.sm-perch-snow{color:#171b24}
 #app-mount.sm-weather-root{transition:filter .45s ease}#app-mount.sm-weather-root.sm-rain-tone{filter:brightness(.97) contrast(.975)}
-#app-mount.sm-preview-black{--background-primary:#0b0c10;--background-secondary:#111218;--background-tertiary:#08090c;--background-base-lowest:#08090c;--background-base-lower:#0b0c10;--background-base-low:#111218;--bg-base-primary:#0b0c10;--bg-base-secondary:#111218;--channeltextarea-background:#1a1b23;--text-normal:#e9eaf1;--text-strong:#fff}
-#app-mount.sm-preview-nitro{--background-primary:#261d38;--background-secondary:#21192f;--background-tertiary:#191326;--background-base-lowest:#191326;--background-base-lower:#21192f;--background-base-low:#2d2240;--bg-base-primary:#261d38;--bg-base-secondary:#21192f;--channeltextarea-background:#382b4d;--brand-500:#aa79f1;--text-link:#d4b8ff;--text-normal:#f0eafa;--text-strong:#fff}
-#app-mount.sm-preview-nitro [class*="chatContent"]{background:radial-gradient(ellipse at 70% 0%,rgba(155,95,236,.16),transparent 55%),linear-gradient(135deg,#211a32,#30213f 65%,#22192f)}
 #seasonal-moments-layer .sm-rain-drop{position:absolute;inset:0 auto 0 var(--sm-left);width:20px;pointer-events:none}
 #seasonal-moments-layer .sm-rain-streak{position:absolute;top:0;left:4px;width:12px;height:var(--sm-rain-length);animation:sm-rain-fall var(--sm-rain-duration) linear var(--sm-rain-delay) infinite}
 #seasonal-moments-layer .sm-rain-streak::before{content:"";display:block;margin-left:5px;width:1.5px;height:100%;border-radius:2px;background:linear-gradient(to bottom,transparent,rgba(145,189,230,.20),rgba(195,225,250,.75));box-shadow:0 0 5px rgba(135,185,230,.24)}
@@ -101,7 +100,7 @@ function parseBirthday(value) {
 
 module.exports = class SeasonalMoments {
     constructor() {
-        this.settings = {birthday: null, welcomeSeen: false, seasonal: true, rain: true, storm: true, effectMode: "auto", birthdayEffect: true, interactions: false, blur: 2, intensity: "normal", previewHotkeys: true};
+        this.settings = {birthday: null, welcomeSeen: false, seasonal: true, rain: true, storm: true, effectMode: "auto", birthdayEffect: true, interactions: false, blur: 2, intensity: "normal"};
         this.hiddenFor = {birthday: null, newyear: null};
         this.cards = {birthday: null, newyear: null};
         this.modeKey = "";
@@ -127,15 +126,12 @@ module.exports = class SeasonalMoments {
         this.localeStore = null;
         this.nicknameParticles = new Map();
         this.nextNicknameAt = 0;
-        this.previewMode = null;
-        this.previewTheme = null;
-        this.themeSnapshot = null;
-        this.previewHidden = null;
     }
 
     start() {
         const saved = BdApi.Data.load(NAME, "settings");
         if (saved && typeof saved === "object") this.settings = {...this.settings, ...saved};
+        delete this.settings.previewHotkeys;
         this.settings.birthday = /^\d{2}-\d{2}$/.test(this.settings.birthday || "") ? this.settings.birthday : null;
         if (!["auto", "autumn", "winter", "spring", "summer", "rain", "storm", "newyear", "none"].includes(this.settings.effectMode)) this.settings.effectMode = "auto";
         BdApi.DOM.addStyle(STYLE_ID, CSS);
@@ -145,11 +141,9 @@ module.exports = class SeasonalMoments {
         this.tick = this.tick.bind(this);
         this.scheduleTick = this.scheduleTick.bind(this);
         this.positionLayer = this.positionLayer.bind(this);
-        this.onPreviewKeyDown = this.onPreviewKeyDown.bind(this);
         this.tick();
         this.timer = setInterval(this.tick, 1500);
         window.addEventListener("resize", this.scheduleTick);
-        window.addEventListener("keydown", this.onPreviewKeyDown, true);
         this.observer = new MutationObserver(this.scheduleTick);
         this.observer.observe(document.querySelector("#app-mount") || document.body, {childList: true, subtree: true});
         if (!this.settings.welcomeSeen && !this.settings.birthday) this.showWelcome();
@@ -158,8 +152,6 @@ module.exports = class SeasonalMoments {
     stop() {
         clearInterval(this.timer);
         window.removeEventListener("resize", this.scheduleTick);
-        window.removeEventListener("keydown", this.onPreviewKeyDown, true);
-        this.resetPreview(false);
         this.observer?.disconnect();
         if (this.frame != null) cancelAnimationFrame(this.frame);
         this.stopThunder();
@@ -198,68 +190,6 @@ module.exports = class SeasonalMoments {
         if (store) this.localeStore = store;
         const locale = store?.locale || navigator.language || "en";
         return /^ru(?:[-_]|$)/i.test(locale);
-    }
-
-    onPreviewKeyDown(event) {
-        if (!this.settings.previewHotkeys || event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
-        if (event.target?.closest?.('input, textarea, [contenteditable="true"], [role="textbox"], [data-slate-editor="true"]')) return;
-        const code = event.code || "";
-        if ((code === "Escape" || event.key === "Escape") && (this.previewMode !== null || this.previewTheme !== null)) {
-            event.preventDefault(); event.stopImmediatePropagation(); this.resetPreview(); return;
-        }
-        if (!this.findChat() && !this.findCall()) return;
-        const digit = /^(?:Digit|Numpad)([1-9])$/.exec(code);
-        const modes = ["autumn", "winter", "spring", "summer", "rain", "storm", "birthday", "newyear", "none"];
-        if (digit) {
-            event.preventDefault(); event.stopImmediatePropagation();
-            this.previewMode = modes[Number(digit[1]) - 1];
-            this.previewHidden = null;
-            this.modeKey = "";
-            this.tick();
-            return;
-        }
-        const key = code === "KeyQ" || ["q", "й"].includes(event.key?.toLowerCase()) ? "black"
-            : code === "KeyW" || ["w", "ц"].includes(event.key?.toLowerCase()) ? "light"
-            : code === "KeyE" || ["e", "у"].includes(event.key?.toLowerCase()) ? "nitro" : null;
-        if (!key) return;
-        event.preventDefault(); event.stopImmediatePropagation();
-        this.applyPreviewTheme(key);
-    }
-
-    applyPreviewTheme(theme) {
-        if (!this.themeSnapshot) {
-            const selector = PREVIEW_THEME_CLASSES.map(name => `.${name}`).join(",");
-            const nodes = new Set([document.documentElement, document.body, document.querySelector("#app-mount"), ...document.querySelectorAll(selector)]);
-            this.themeSnapshot = [...nodes].filter(Boolean).map(node => ({node, classes: PREVIEW_THEME_CLASSES.filter(name => node.classList.contains(name))}));
-        }
-        for (const {node} of this.themeSnapshot) {
-            node.classList.remove(...PREVIEW_THEME_CLASSES);
-            node.classList.add(theme === "light" ? "theme-light" : "theme-dark");
-        }
-        const root = document.querySelector("#app-mount");
-        root?.classList.toggle("sm-preview-black", theme === "black");
-        root?.classList.toggle("sm-preview-nitro", theme === "nitro");
-        this.previewTheme = theme;
-        if (this.layer) this.tick();
-    }
-
-    restorePreviewTheme() {
-        for (const {node, classes} of this.themeSnapshot || []) {
-            node.classList.remove(...PREVIEW_THEME_CLASSES);
-            node.classList.add(...classes);
-        }
-        const root = document.querySelector("#app-mount");
-        root?.classList.remove("sm-preview-black", "sm-preview-nitro");
-        this.themeSnapshot = null;
-        this.previewTheme = null;
-    }
-
-    resetPreview(refresh = true) {
-        this.previewMode = null;
-        this.previewHidden = null;
-        this.modeKey = "";
-        this.restorePreviewTheme();
-        if (refresh && this.layer) this.tick();
     }
 
     scheduleTick() {
@@ -342,7 +272,6 @@ module.exports = class SeasonalMoments {
             onChange: (_, id, value) => {
                 this.settings[id] = id === "blur" ? Number(value) : value;
                 if (id === "rain" || id === "storm") this.weather = null;
-                if (id === "previewHotkeys" && !value) this.resetPreview(false);
                 this.save();
             },
             settings: [
@@ -370,11 +299,6 @@ module.exports = class SeasonalMoments {
                 {type: "category", id: "birthday", name: ru ? "ДЕНЬ РОЖДЕНИЯ" : "BIRTHDAY", shown: true, settings: [
                     {type: "custom", id: "birthdayDate", name: ru ? "Дата рождения" : "Birthday date", note: ru ? "Год не нужен. 29 февраля отмечается 28 февраля в невисокосный год." : "No year needed. February 29 moves to February 28 in non-leap years.", inline: false, children: React.createElement(DatePicker)},
                     {type: "switch", id: "birthdayEffect", name: ru ? "Поздравление и блёстки" : "Birthday card and sparkles", note: ru ? "Личная карточка в чате появляется только в день рождения." : "A private chat card appears only on your birthday.", value: this.settings.birthdayEffect}
-                ]},
-                {type: "category", id: "preview", name: ru ? "ПРЕДПРОСМОТР ДЛЯ ЗАПИСИ" : "RECORDING PREVIEW", shown: true, settings: [
-                    {type: "switch", id: "previewHotkeys", name: ru ? "Горячие клавиши предпросмотра" : "Preview hotkeys", note: ru
-                        ? "1 листья · 2 снег · 3 цветы · 4 звёзды · 5 дождь · 6 гроза · 7 день рождения · 8 Новый год · 9 выключить. Й/Ц/У: чёрная, светлая, Nitro-подобная тема. Esc: вернуть обычный вид. Не работают при вводе текста."
-                        : "1 leaves · 2 snow · 3 flowers · 4 stars · 5 rain · 6 storm · 7 birthday · 8 New Year · 9 off. Q/W/E: black, light, Nitro-inspired theme. Esc restores the normal view. Disabled while typing.", value: this.settings.previewHotkeys}
                 ]}
             ]
         });
@@ -402,7 +326,6 @@ module.exports = class SeasonalMoments {
 
     getMode(now) {
         this.rollWeather(now);
-        if (this.previewMode !== null) return this.previewMode === "storm" ? "rain" : this.previewMode;
         if (this.settings.effectMode !== "auto") return this.settings.effectMode === "storm" ? "rain" : this.settings.effectMode;
         if (this.settings.seasonal && this.isNewYear(now)) return "newyear";
         if (this.settings.birthdayEffect && this.birthdayToday(now)) return "birthday";
@@ -416,7 +339,6 @@ module.exports = class SeasonalMoments {
     }
 
     stormActive() {
-        if (this.previewMode !== null) return this.previewMode === "storm";
         return this.settings.effectMode === "storm" || (this.settings.effectMode === "auto" && Boolean(this.weather?.storm));
     }
 
@@ -573,8 +495,8 @@ module.exports = class SeasonalMoments {
 
     updateTree(now, visible) {
         const winter = this.mode === "winter" || this.mode === "newyear";
-        const preview = this.previewMode === "winter" || this.previewMode === "newyear" || this.settings.effectMode === "winter" || this.settings.effectMode === "newyear";
-        if (!visible || !winter || (now.getMonth() !== 11 && !preview)) { this.treeNode?.remove(); return; }
+        const manualWinter = this.settings.effectMode === "winter" || this.settings.effectMode === "newyear";
+        if (!visible || !winter || (now.getMonth() !== 11 && !manualWinter)) { this.treeNode?.remove(); return; }
         const host = this.snowbankHost;
         if (!host || !this.snowbank?.isConnected) { this.treeNode?.remove(); return; }
         if (!this.treeNode) {
@@ -854,7 +776,7 @@ module.exports = class SeasonalMoments {
     }
 
     isLightTheme(node) {
-        return this.previewTheme === "light" || Boolean(node?.closest?.(".theme-light") || document.documentElement.classList.contains("theme-light"));
+        return Boolean(node?.closest?.(".theme-light") || document.documentElement.classList.contains("theme-light"));
     }
 
     tick() {
@@ -870,7 +792,6 @@ module.exports = class SeasonalMoments {
             if (!this.absenceTimer && !this.fadeRemovalTimer) this.absenceTimer = setTimeout(() => {
                 this.absenceTimer = null;
                 if (this.findCall() || this.findChat()) { this.scheduleTick(); return; }
-                if (this.previewMode !== null || this.previewTheme !== null) this.resetPreview(false);
                 this.layer.style.opacity = "0";
                 this.removeCards();
                 this.updateTree(now, false);
@@ -1045,13 +966,8 @@ module.exports = class SeasonalMoments {
         if (!host) return;
         const day = now.toDateString();
         const active = [];
-        if (this.previewMode !== null) {
-            if (this.previewMode === "birthday" && this.previewHidden !== "birthday") active.push("birthday");
-            if (this.previewMode === "newyear" && this.previewHidden !== "newyear") active.push("newyear");
-        } else {
-            if (this.settings.birthdayEffect && this.birthdayToday(now) && this.hiddenFor.birthday !== day) active.push("birthday");
-            if (this.isNewYear(now) && this.hiddenFor.newyear !== day) active.push("newyear");
-        }
+        if (this.settings.birthdayEffect && this.birthdayToday(now) && this.hiddenFor.birthday !== day) active.push("birthday");
+        if (this.isNewYear(now) && this.hiddenFor.newyear !== day) active.push("newyear");
         for (const kind of ["birthday", "newyear"]) if (!active.includes(kind)) this.cards[kind]?.remove();
         if (!active.length) return;
         const locale = this.isRussian() ? "ru" : "en";
@@ -1129,8 +1045,7 @@ module.exports = class SeasonalMoments {
     }
 
     hideCard(kind) {
-        if (this.previewMode === kind) this.previewHidden = kind;
-        else this.hiddenFor[kind] = new Date().toDateString();
+        this.hiddenFor[kind] = new Date().toDateString();
         this.cards[kind]?.remove();
     }
 

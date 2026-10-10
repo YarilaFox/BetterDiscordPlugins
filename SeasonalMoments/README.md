@@ -1,12 +1,10 @@
 # SeasonalMoments for BetterDiscord
 
-[Русский](./README.ru.md)
+by [YarilaFox](https://canary.discord.com/channels/@me/657887591634305036)
 
 ## Preview
 
-Add your GIF as `assets/effects.gif` and uncomment this line:
-
-<!-- ![SeasonalMoments effects](assets/effects.gif) -->
+![SeasonalMoments effects](./assets/effects.gif)
 
 SeasonalMoments adds seasonal effects to chats and calls. Autumn brings falling leaves based on the supplied SVG. Winter adds falling snow and a fixed, flat snowbank made of overlapping circles along the top of the message box. Spring brings flowers. Summer displays softly twinkling stars of different sizes near the top of the chat. Occasional rain can replace the seasonal effect; raindrops bounce off the message box and make flat splashes. Some rain sessions also include a gentle flash over one half of the chat.
 
@@ -19,10 +17,6 @@ In Auto mode, the plugin decides whether it will rain when it starts and at the 
 BetterDiscord's plugin settings let you choose Auto, a season, rain, thunderstorm, New Year, or Off. The choice persists across restarts. You can also adjust particle density, blur, and particle interaction. When interaction is enabled, leaves, snow, and flowers sometimes settle on a visible username for a few seconds, with a 4% chance per visible username per check, capped at 10% overall. Particles appear behind messages and do not cover the message box. They keep their animation phase when switching between chats and disappear outside chats and calls. Animations are hidden when reduced motion is enabled.
 
 The plugin follows Discord's language setting for its interface text. Russian and English are supported; other languages use English.
-
-## Recording preview
-
-In a chat, keys `1`–`9` temporarily select leaves, snow, flowers, stars, rain, thunderstorm, birthday, New Year, and no effect. The physical `Q`/`W`/`E` keys select black, light, and Nitro-inspired preview themes. Press `Esc` to restore the normal effect and appearance. Preview choices are not saved, and the shortcuts do not run while typing. You can disable preview hotkeys in the plugin settings.
 
 ## Installation
 
