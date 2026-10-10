@@ -2,7 +2,7 @@
  * @name SeasonalMoments
  * @author arikm
  * @description Seasonal particles, winter snow, fireworks, and private holiday cards in chats and calls.
- * @version 0.7.0
+ * @version 0.7.1
  */
 
 /* The autumn leaf shape is MIT licensed: Diemen Design, LibreICONS.
@@ -31,17 +31,22 @@ const CSS = `
 #seasonal-moments-layer .sm-particle svg{width:100%;height:100%;fill:currentColor}
 #seasonal-moments-layer .sm-particle.sm-snow,.sm-snowfall-bridge .sm-particle.sm-snow{border-radius:50%;background:currentColor;box-shadow:0 0 6px rgba(221,240,255,.32);animation-name:sm-snow-fall}
 #seasonal-moments-layer .sm-particle.sm-summer-star{top:var(--sm-star-top);border-radius:50%;background:currentColor;box-shadow:0 0 var(--sm-star-glow) currentColor;animation:sm-star-twinkle var(--sm-duration) ease-in-out var(--sm-delay) infinite}
+#seasonal-moments-layer.sm-light-particles .sm-particle.sm-snow,.sm-snowfall-bridge.sm-light-particles .sm-particle.sm-snow,#seasonal-moments-layer.sm-light-particles .sm-particle.sm-summer-star,#seasonal-moments-layer.sm-light-particles .sm-particle.sm-birthday-sparkle{color:#171b24;box-shadow:0 0 5px rgba(23,27,36,.2)}
 .sm-composer-snowbank{position:absolute;top:0;left:0;width:100%;height:14px;overflow:hidden;pointer-events:none;z-index:1;border-radius:8px 8px 0 0}
 .sm-composer-snowbank svg{display:block;width:100%;height:100%}
+.sm-composer-snowbank.sm-light-particles path{fill:rgba(23,27,36,.7)}
 #seasonal-moments-layer .sm-firework-launch{position:absolute;bottom:1px;left:var(--sm-fw-left);height:var(--sm-fw-launch-height,22px);width:var(--sm-fw-launch-width,2px);border-radius:2px;background:linear-gradient(transparent,var(--sm-fw-color));box-shadow:0 0 7px var(--sm-fw-color);animation:sm-fw-launch var(--sm-fw-launch-duration,.48s) ease-out forwards;pointer-events:none}
 #seasonal-moments-layer .sm-firework-ray{position:absolute;left:var(--sm-fw-left);top:var(--sm-fw-top);width:var(--sm-fw-size);height:var(--sm-fw-size);color:var(--sm-fw-color);opacity:0;animation:sm-fw-burst var(--sm-fw-burst-duration,1.1s) ease-out var(--sm-fw-delay) forwards;pointer-events:none}
+#seasonal-moments-layer.sm-light-particles .sm-firework-ray{color:#171b24}
 #seasonal-moments-layer .sm-firework-ray svg{width:100%;height:100%;fill:currentColor;filter:drop-shadow(0 0 3px currentColor)}
 #seasonal-moments-layer .sm-firework-ray::after{content:"";position:absolute;left:50%;top:50%;width:1px;height:var(--sm-fw-tail);background:linear-gradient(currentColor,transparent);transform-origin:top;transform:rotate(var(--sm-fw-angle));opacity:.6}
 #seasonal-moments-layer .sm-birthday-burst{position:absolute;left:var(--sm-burst-left);top:var(--sm-burst-top);width:var(--sm-burst-size);height:var(--sm-burst-size);color:var(--sm-burst-color);opacity:0;animation:sm-birthday-burst .9s ease-out forwards;pointer-events:none}
+#seasonal-moments-layer.sm-light-particles .sm-birthday-burst{color:#171b24}
 #seasonal-moments-layer .sm-birthday-burst svg{width:100%;height:100%;fill:currentColor}
 .sm-nickname-perch{position:absolute;bottom:calc(100% - 4px);left:var(--sm-perch-left);display:block;width:var(--sm-perch-size);height:var(--sm-perch-size);color:var(--sm-perch-color);font-size:var(--sm-perch-size);line-height:1;pointer-events:none;user-select:none;z-index:2;animation:sm-nickname-land 4.5s ease-out forwards}
 .sm-nickname-perch svg{display:block;width:100%;height:100%;fill:currentColor}
 .sm-nickname-perch.sm-perch-snow{border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}
+.theme-light .sm-nickname-perch.sm-perch-snow{color:#171b24}
 #app-mount.sm-weather-root{transition:filter .45s ease}#app-mount.sm-weather-root.sm-rain-tone{filter:brightness(.97) contrast(.975)}
 #app-mount.sm-preview-black{--background-primary:#0b0c10;--background-secondary:#111218;--background-tertiary:#08090c;--background-base-lowest:#08090c;--background-base-lower:#0b0c10;--background-base-low:#111218;--bg-base-primary:#0b0c10;--bg-base-secondary:#111218;--channeltextarea-background:#1a1b23;--text-normal:#e9eaf1;--text-strong:#fff}
 #app-mount.sm-preview-nitro{--background-primary:#261d38;--background-secondary:#21192f;--background-tertiary:#191326;--background-base-lowest:#191326;--background-base-lower:#21192f;--background-base-low:#2d2240;--bg-base-primary:#261d38;--bg-base-secondary:#21192f;--channeltextarea-background:#382b4d;--brand-500:#aa79f1;--text-link:#d4b8ff;--text-normal:#f0eafa;--text-strong:#fff}
@@ -49,7 +54,9 @@ const CSS = `
 #seasonal-moments-layer .sm-rain-drop{position:absolute;inset:0 auto 0 var(--sm-left);width:20px;pointer-events:none}
 #seasonal-moments-layer .sm-rain-streak{position:absolute;top:0;left:4px;width:12px;height:var(--sm-rain-length);animation:sm-rain-fall var(--sm-rain-duration) linear var(--sm-rain-delay) infinite}
 #seasonal-moments-layer .sm-rain-streak::before{content:"";display:block;margin-left:5px;width:1.5px;height:100%;border-radius:2px;background:linear-gradient(to bottom,transparent,rgba(145,189,230,.20),rgba(195,225,250,.75));box-shadow:0 0 5px rgba(135,185,230,.24)}
+#seasonal-moments-layer.sm-light-particles .sm-rain-streak::before{background:linear-gradient(to bottom,transparent,rgba(39,64,91,.26),rgba(23,44,69,.78));box-shadow:0 0 4px rgba(23,44,69,.18)}
 #seasonal-moments-layer .sm-rain-splash{position:absolute;left:calc(5px + var(--sm-rain-drift));bottom:3px;width:10px;height:1px;background:rgba(190,223,252,.6);opacity:0;transform-origin:center;animation:sm-rain-splash var(--sm-rain-duration) linear var(--sm-rain-delay) infinite}
+#seasonal-moments-layer.sm-light-particles .sm-rain-splash{background:rgba(23,44,69,.62)}
 #seasonal-moments-layer .sm-rain-splash::before,#seasonal-moments-layer .sm-rain-splash::after{content:"";position:absolute;bottom:1px;width:4px;height:1px;background:inherit}
 #seasonal-moments-layer .sm-rain-splash::before{left:-3px;transform:rotate(-35deg)}
 #seasonal-moments-layer .sm-rain-splash::after{right:-3px;transform:rotate(35deg)}
@@ -233,6 +240,7 @@ module.exports = class SeasonalMoments {
         root?.classList.toggle("sm-preview-black", theme === "black");
         root?.classList.toggle("sm-preview-nitro", theme === "nitro");
         this.previewTheme = theme;
+        if (this.layer) this.tick();
     }
 
     restorePreviewTheme() {
@@ -620,6 +628,7 @@ module.exports = class SeasonalMoments {
             this.snowBridge.setAttribute("aria-hidden", "true");
             document.body.appendChild(this.snowBridge);
         }
+        this.snowBridge.classList.toggle("sm-light-particles", this.layer.classList.contains("sm-light-particles"));
         const rightInset = Math.max(0, layerRect.right - bankRect.right);
         const leftInset = Math.max(0, bankRect.left - layerRect.left);
         Object.assign(this.snowBridge.style, {
@@ -659,6 +668,7 @@ module.exports = class SeasonalMoments {
             if (this.snowbankPositionChanged) host.style.position = "relative";
             host.appendChild(this.snowbank);
         }
+        this.snowbank.classList.toggle("sm-light-particles", this.isLightTheme(host));
         const outerRect = host.getBoundingClientRect();
         const innerRect = inner?.getBoundingClientRect() || outerRect;
         const right = outerRect.right - innerRect.right >= 0 && outerRect.right - innerRect.right <= 32
@@ -823,6 +833,7 @@ module.exports = class SeasonalMoments {
 
     positionLayer() {
         if (!this.viewport || !this.layer) return;
+        this.layer.classList.toggle("sm-light-particles", this.isLightTheme(this.layer));
         const viewportRect = this.viewport.getBoundingClientRect();
         const composer = this.surfaceKind === "chat" ? document.querySelector('main [class*="channelTextArea"], [class*="channelTextArea"]') : null;
         const composerTop = composer?.getBoundingClientRect().top;
@@ -840,6 +851,10 @@ module.exports = class SeasonalMoments {
         this.layer.style.setProperty("--sm-height", `${bankTop == null ? height : bankTop - this.layer.getBoundingClientRect().top}px`);
         const blur = Number(this.settings.blur || 0);
         this.layer.style.setProperty("--sm-layer-blur", `${this.mode === "rain" ? Math.min(blur, 1.5) : this.mode === "birthday" || this.mode === "newyear" ? Math.min(blur, .5) : blur}px`);
+    }
+
+    isLightTheme(node) {
+        return this.previewTheme === "light" || Boolean(node?.closest?.(".theme-light") || document.documentElement.classList.contains("theme-light"));
     }
 
     tick() {
@@ -1003,6 +1018,7 @@ module.exports = class SeasonalMoments {
         if (summer) {
             particle.classList.add("sm-summer-star");
         } else if (mode === "birthday") {
+            particle.classList.add("sm-birthday-sparkle");
             particle.appendChild(this.makeSparkleSvg());
         } else if (snow) {
             particle.classList.add("sm-snow");
