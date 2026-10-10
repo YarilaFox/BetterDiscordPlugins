@@ -20,6 +20,10 @@ BetterDiscord's plugin settings let you choose Auto, a season, rain, thunderstor
 
 The plugin follows Discord's language setting for its interface text. Russian and English are supported; other languages use English.
 
+## Recording preview
+
+In a chat, keys `1`–`9` temporarily select leaves, snow, flowers, stars, rain, thunderstorm, birthday, New Year, and no effect. The physical `Q`/`W`/`E` keys select black, light, and Nitro-inspired preview themes. Press `Esc` to restore the normal effect and appearance. Preview choices are not saved, and the shortcuts do not run while typing. You can disable preview hotkeys in the plugin settings.
+
 ## Installation
 
 Copy [SeasonalMoments.plugin.js](./SeasonalMoments.plugin.js) to `%appdata%\BetterDiscord\plugins`, then enable **SeasonalMoments** in BetterDiscord's plugin settings. 
