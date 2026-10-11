@@ -2,7 +2,7 @@
  * @name SeasonalMoments
  * @author YarilaFox
  * @description Seasonal particles, winter snow, fireworks, and private holiday cards in chats and calls.
- * @version 0.8.1
+ * @version 0.8.2
  * @authorLink https://canary.discord.com/channels/@me/657887591634305036
  * @website https://github.com/YarilaFox/BetterDiscordPlugins/tree/main/SeasonalMoments
  * @source https://github.com/YarilaFox/BetterDiscordPlugins/blob/main/SeasonalMoments/SeasonalMoments.plugin.js
@@ -26,7 +26,7 @@ const LEAF_PATH = "m 9.2375,10.433335 c -0.9041667,0.45 -1.9145833,0.71666 -2.93
 const TREE_EMOJI_DATA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iIzY2MjExMyIgZD0iTTIyLjA4OCAzMi44M2MwIDEuOTk3LTEuNjE5IDIuNzEyLTMuNjE2IDIuNzEycy0zLjYxNi0uNzE1LTMuNjE2LTIuNzEybC45MDQtOC4xMzZjMC0xLjk5Ni43MTUtMS44MDggMi43MTItMS44MDggMS45OTcgMCAyLjcxMi0uMTg4IDIuNzEyIDEuODA4bC45MDQgOC4xMzZ6Ii8+PHBhdGggZmlsbD0iIzVDOTEzQiIgZD0iTTMwLjU5IDI3LjY3NWMtNi4yOTQtNS4zOTItOC44NDMtMTMuMTEyLTEyLjExOC0xMy4xMTJzLTUuODI0IDcuNzIxLTEyLjExOCAxMy4xMTJjLTIuNjQ1IDIuMjY2LTEuMzg1IDMuNTc3IDIuMjQxIDMuMzE0IDMuMjMyLS4yMzMgNi4yNTUtLjk2NiA5Ljg3Ny0uOTY2czYuNjQ2LjczMyA5Ljg3Ni45NjZjMy42MjcuMjYzIDQuODg2LTEuMDQ5IDIuMjQyLTMuMzE0eiIvPjxwYXRoIGZpbGw9IiMzRTcyMUQiIGQ9Ik0yOC41NDYgMjUuNTM4Yy00LjgzNy00LjQzNS03LjU1NS0xMC43ODctMTAuMDc0LTEwLjc4Ny0yLjUxNyAwLTUuMjM2IDYuMzUyLTEwLjA3MyAxMC43ODctMy44NDQgMy41MjQgNS4wMzcgNC4zMTUgMTAuMDczIDAgNS4wMzQgNC4zMTYgMTMuOTE3IDMuNTI0IDEwLjA3NCAweiIvPjxwYXRoIGZpbGw9IiM1QzkxM0IiIGQ9Ik0yOC41NDYgMjEuOTQ1Yy00LjgzNy00LjE0My03LjU1NS0xMC4wNzctMTAuMDc0LTEwLjA3Ny0yLjUxNyAwLTUuMjM2IDUuOTM0LTEwLjA3MyAxMC4wNzctMy44NDQgMy4yOTIgNS4wMzcgNC4wMzEgMTAuMDczIDAgNS4wMzQgNC4wMzIgMTMuOTE3IDMuMjkyIDEwLjA3NCAweiIvPjxwYXRoIGZpbGw9IiMzRTcyMUQiIGQ9Ik0yNi4zMzYgMTkuMDAzYy0zLjc3NS0zLjIzNS01Ljg5Ny03Ljg2OC03Ljg2NC03Ljg2OC0xLjk2NSAwLTQuMDg4IDQuNjMyLTcuODY0IDcuODY4LTMgMi41NyAzLjkzMiAzLjE0NyA3Ljg2NCAwIDMuOTMgMy4xNDYgMTAuODY1IDIuNTcgNy44NjQgMHoiLz48cGF0aCBmaWxsPSIjNUM5MTNCIiBkPSJNMjYuMzM2IDE2LjMxMWMtMy43NzUtMy4yMzUtNS44OTctNy44NjctNy44NjQtNy44NjctMS45NjUgMC00LjA4OCA0LjYzMi03Ljg2NCA3Ljg2Ny0zIDIuNTcxIDMuOTMyIDMuMTQ3IDcuODY0IDAgMy45MyAzLjE0NyAxMC44NjUgMi41NzEgNy44NjQgMHoiLz48cGF0aCBmaWxsPSIjM0U3MjFEIiBkPSJNMjQuODE4IDEzLjkyYy0zLjA0Ny0yLjYxLTQuNzYtNi4zNDktNi4zNDctNi4zNDktMS41ODYgMC0zLjI5OSAzLjczOS02LjM0NyA2LjM0OS0yLjQyMiAyLjA3NSAzLjE3NCAyLjU0IDYuMzQ3IDAgMy4xNzQgMi41NCA4Ljc3IDIuMDc1IDYuMzQ3IDB6Ii8+PHBhdGggZmlsbD0iIzVDOTEzQiIgZD0iTTI0LjgxOCAxMS44OTRjLTMuMDQ3LTIuNjEtNC43Ni02LjM0OS02LjM0Ny02LjM0OS0xLjU4NiAwLTMuMjk5IDMuNzM5LTYuMzQ3IDYuMzQ5LTIuNDIyIDIuMDc1IDMuMTc0IDIuNTQgNi4zNDcgMCAzLjE3NCAyLjU0IDguNzcgMi4wNzUgNi4zNDcgMHoiLz48cGF0aCBmaWxsPSIjM0U3MjFEIiBkPSJNMjMuMzAxIDguOTExQzIwLjk4MyA2LjkyNSAxOS42OCA0LjA4IDE4LjQ3MiA0LjA4Yy0xLjIwNyAwLTIuNTExIDIuODQ1LTQuODMgNC44MzEtMS44NDMgMS41NzkgMi40MTUgMS45MzMgNC44MyAwIDIuNDE0IDEuOTMzIDYuNjczIDEuNTc5IDQuODI5IDB6Ii8+PHBhdGggZmlsbD0iIzVDOTEzQiIgZD0iTTIzLjMwMSA3LjgzMkMyMC45ODMgNS44NDUgMTkuNjggMyAxOC40NzIgM2MtMS4yMDcgMC0yLjUxMSAyLjg0NS00LjgzIDQuODMyLTEuODQzIDEuNTc5IDIuNDE1IDEuOTMzIDQuODMgMCAyLjQxNCAxLjkzMiA2LjY3MyAxLjU3OCA0LjgyOSAweiIvPjxjaXJjbGUgZmlsbD0iI0ZGQ0M0RCIgY3g9IjE2LjUiIGN5PSIxMi4wNDIiIHI9IjEuNSIvPjxjaXJjbGUgZmlsbD0iI0ZGQ0M0RCIgY3g9IjIwIiBjeT0iMjUiIHI9IjIiLz48Y2lyY2xlIGZpbGw9IiNERDJFNDQiIGN4PSIyMi41IiBjeT0iMTUuNSIgcj0iMi41Ii8+PGNpcmNsZSBmaWxsPSIjREQyRTQ0IiBjeD0iMTAiIGN5PSIyNiIgcj0iMiIvPjxjaXJjbGUgZmlsbD0iI0E2RDM4OCIgY3g9IjE0IiBjeT0iMTkiIHI9IjIiLz48Y2lyY2xlIGZpbGw9IiNBNkQzODgiIGN4PSIyNiIgY3k9IjIzIiByPSIyIi8+PHBhdGggZmlsbD0iI0ZGQUMzMyIgZD0iTTE5LjM3OSAxLjY3OWMuMTQzLjI3NS41MTIuNTQ5LjgxNy42MDlsMS4zNzkuMjY5Yy4zMDUuMDYuMzc3LjI5LjE1OS41MTJsLS45ODMgMS4wMDRjLS4yMTcuMjIyLS4zNjUuNjU3LS4zMjYuOTY1bC4xNyAxLjM5NGMuMDM4LjMwOS0uMTU5LjQ0OC0uNDM4LjMxTDE4LjkgNi4xMTdjLS4yNzktLjEzOC0uNzM4LS4xNDQtMS4wMi0uMDEzbC0xLjI3NC41OTRjLS4yODIuMTMtLjQ3Ni0uMDE0LS40My0uMzIybC4yMDUtMS4zOWMuMDQ1LS4zMDctLjA5MS0uNzQ1LS4zMDItLjk3M2wtLjk1OS0xLjAyN2MtLjIxMi0uMjI3LS4xMzUtLjQ1Ny4xNzItLjUwOGwxLjM4NS0uMjM0Yy4zMDctLjA1MS42ODEtLjMxNi44MzItLjU4OEwxOC4xOS40MjdjLjE1MS0uMjcyLjM5NC0uMjY5LjUzNy4wMDZsLjY1MiAxLjI0NnoiLz48L3N2Zz4=";
 
 const CSS = `
-#seasonal-moments-layer{position:absolute;overflow:hidden;pointer-events:none;z-index:0;contain:layout style paint;filter:blur(var(--sm-layer-blur,0px));transition:opacity .2s ease}
+#seasonal-moments-layer{position:fixed;overflow:hidden;pointer-events:none;z-index:0;contain:layout style paint;filter:blur(var(--sm-layer-blur,0px));transition:opacity .2s ease}
 #seasonal-moments-layer.sm-call-layer{z-index:1;opacity:.7}
 #seasonal-moments-layer .sm-particle,.sm-snowfall-bridge .sm-particle{position:absolute;top:-40px;left:var(--sm-left);width:var(--sm-size);height:var(--sm-size);display:flex;align-items:center;justify-content:center;color:var(--sm-color);font-size:var(--sm-size);line-height:1;opacity:var(--sm-opacity);animation:sm-fall var(--sm-duration) linear var(--sm-delay) infinite;will-change:transform;user-select:none}
 .sm-snowfall-bridge{position:fixed;overflow:hidden;pointer-events:none;z-index:5;contain:layout style paint;filter:blur(var(--sm-layer-blur,0px))}
@@ -764,8 +764,8 @@ module.exports = class SeasonalMoments {
             ? Math.min(this.viewport.clientHeight, composerTop - viewportRect.top - 2)
             : this.viewport.clientHeight;
         Object.assign(this.layer.style, {
-            top: `${this.viewport.scrollTop}px`,
-            left: `${this.viewport.scrollLeft}px`,
+            top: `${viewportRect.top}px`,
+            left: `${viewportRect.left}px`,
             width: `${this.viewport.clientWidth}px`,
             height: `${height}px`
         });
