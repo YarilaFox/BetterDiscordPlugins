@@ -2,7 +2,7 @@
  * @name SeasonalMoments
  * @author YarilaFox
  * @description Seasonal particles, winter snow, fireworks, and private holiday cards in chats and calls.
- * @version 0.8.3
+ * @version 0.8.4
  * @authorLink https://canary.discord.com/channels/@me/657887591634305036
  * @website https://github.com/YarilaFox/BetterDiscordPlugins/tree/main/SeasonalMoments
  * @source https://github.com/YarilaFox/BetterDiscordPlugins/blob/main/SeasonalMoments/SeasonalMoments.plugin.js
@@ -28,6 +28,8 @@ const TREE_EMOJI_DATA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3d
 const CSS = `
 #seasonal-moments-layer{position:fixed;overflow:hidden;pointer-events:none;z-index:0;contain:layout style paint;filter:blur(var(--sm-layer-blur,0px));transition:opacity .2s ease}
 #seasonal-moments-layer.sm-call-layer{z-index:1;opacity:.7}
+#seasonal-moments-layer.sm-rain-tone::before{content:"";position:absolute;inset:0;background:rgba(220,231,244,.018);pointer-events:none}
+#seasonal-moments-layer.sm-rain-tone.sm-light-particles::before{background:rgba(24,34,50,.028)}
 #seasonal-moments-layer .sm-particle,.sm-snowfall-bridge .sm-particle{position:absolute;top:-40px;left:var(--sm-left);width:var(--sm-size);height:var(--sm-size);display:flex;align-items:center;justify-content:center;color:var(--sm-color);font-size:var(--sm-size);line-height:1;opacity:var(--sm-opacity);animation:sm-fall var(--sm-duration) linear var(--sm-delay) infinite;will-change:transform;user-select:none}
 .sm-snowfall-bridge{position:fixed;overflow:hidden;pointer-events:none;z-index:5;contain:layout style paint;filter:blur(var(--sm-layer-blur,0px))}
 .sm-snowfall-bridge .sm-particle{top:calc(-40px - var(--sm-bridge-offset))}
@@ -50,7 +52,6 @@ const CSS = `
 .sm-nickname-perch svg{display:block;width:100%;height:100%;fill:currentColor}
 .sm-nickname-perch.sm-perch-snow{border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}
 .theme-light .sm-nickname-perch.sm-perch-snow{color:#171b24}
-#app-mount.sm-weather-root{transition:filter .45s ease}#app-mount.sm-weather-root.sm-rain-tone{filter:brightness(.97) contrast(.975)}
 #seasonal-moments-layer .sm-rain-drop{position:absolute;inset:0 auto 0 var(--sm-left);width:20px;pointer-events:none}
 #seasonal-moments-layer .sm-rain-streak{position:absolute;top:0;left:4px;width:12px;height:var(--sm-rain-length);animation:sm-rain-fall var(--sm-rain-duration) linear var(--sm-rain-delay) infinite}
 #seasonal-moments-layer .sm-rain-streak::before{content:"";display:block;margin-left:5px;width:1.5px;height:100%;border-radius:2px;background:linear-gradient(to bottom,transparent,rgba(145,189,230,.20),rgba(195,225,250,.75));box-shadow:0 0 5px rgba(135,185,230,.24)}
@@ -123,7 +124,6 @@ module.exports = class SeasonalMoments {
         this.snowbankWidth = 0;
         this.snowBridge = null;
         this.snowBridgeSource = null;
-        this.toneRoot = null;
         this.localeStore = null;
         this.nicknameParticles = new Map();
         this.nextNicknameAt = 0;
@@ -136,6 +136,7 @@ module.exports = class SeasonalMoments {
         this.settings.birthday = /^\d{2}-\d{2}$/.test(this.settings.birthday || "") ? this.settings.birthday : null;
         if (!["auto", "autumn", "winter", "spring", "summer", "rain", "storm", "newyear", "none"].includes(this.settings.effectMode)) this.settings.effectMode = "auto";
         BdApi.DOM.addStyle(STYLE_ID, CSS);
+        document.querySelector("#app-mount")?.classList.remove("sm-rain-tone", "sm-weather-root");
         this.layer = document.createElement("div");
         this.layer.id = "seasonal-moments-layer";
         this.layer.setAttribute("aria-hidden", "true");
@@ -162,8 +163,6 @@ module.exports = class SeasonalMoments {
         this.absenceTimer = null;
         this.fadeRemovalTimer = null;
         this.updateTone(false);
-        this.toneRoot?.classList.remove("sm-weather-root");
-        this.toneRoot = null;
         this.detachChat();
         for (const timeout of this.timeouts) clearTimeout(timeout);
         this.timeouts.clear();
@@ -358,11 +357,7 @@ module.exports = class SeasonalMoments {
     }
 
     updateTone(active) {
-        const root = document.querySelector("#app-mount");
-        if (this.toneRoot && this.toneRoot !== root) this.toneRoot.classList.remove("sm-rain-tone", "sm-weather-root");
-        this.toneRoot = root;
-        root?.classList.add("sm-weather-root");
-        root?.classList.toggle("sm-rain-tone", active);
+        this.layer?.classList.toggle("sm-rain-tone", active);
     }
 
     stopThunder() {
