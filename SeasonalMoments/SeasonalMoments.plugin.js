@@ -2,7 +2,7 @@
  * @name SeasonalMoments
  * @author YarilaFox
  * @description Seasonal particles, winter snow, fireworks, and private holiday cards in chats and calls.
- * @version 0.8.2
+ * @version 0.8.3
  * @authorLink https://canary.discord.com/channels/@me/657887591634305036
  * @website https://github.com/YarilaFox/BetterDiscordPlugins/tree/main/SeasonalMoments
  * @source https://github.com/YarilaFox/BetterDiscordPlugins/blob/main/SeasonalMoments/SeasonalMoments.plugin.js
@@ -269,6 +269,20 @@ module.exports = class SeasonalMoments {
                 }})),
                 React.createElement("button", {type: "button", onClick: () => { setDay(0); setMonth(0); change(0, 0); }}, ru ? "Сбросить" : "Clear"));
         };
+        const stormSetting = {
+            type: "switch", id: "storm",
+            name: ru ? "Мягкая гроза в режиме Авто" : "Gentle thunderstorm in Auto",
+            note: ru ? "Во время некоторых дождей редко подсвечивает половину чата." : "During some rain sessions, softly lights one half of the chat.",
+            value: this.settings.storm,
+            disabled: !this.settings.rain
+        };
+        const rainSetting = {
+            type: "switch", id: "rain",
+            name: ru ? "Случайный дождь в режиме Авто" : "Occasional rain in Auto",
+            note: ru ? "Шанс определяется месяцем при запуске и раз в новый день." : "Chance depends on the month at startup and each new day.",
+            value: this.settings.rain,
+            onChange: value => { stormSetting.disabled = !Boolean(value); }
+        };
         return BdApi.UI.buildSettingsPanel({
             onChange: (_, id, value) => {
                 this.settings[id] = id === "blur" ? Number(value) : value;
@@ -294,8 +308,8 @@ module.exports = class SeasonalMoments {
                         {label: ru ? "Новый год — фейерверк" : "New Year — fireworks", value: "newyear"},
                         {label: ru ? "Выключено" : "Off", value: "none"}
                     ]},
-                    {type: "switch", id: "rain", name: ru ? "Случайный дождь в режиме Авто" : "Occasional rain in Auto", note: ru ? "Шанс определяется месяцем при запуске и раз в новый день." : "Chance depends on the month at startup and each new day.", value: this.settings.rain},
-                    {type: "switch", id: "storm", name: ru ? "Мягкая гроза в режиме Авто" : "Gentle thunderstorm in Auto", note: ru ? "Во время некоторых дождей редко подсвечивает половину чата." : "During some rain sessions, softly lights one half of the chat.", value: this.settings.storm, enableWith: "rain"}
+                    rainSetting,
+                    stormSetting
                 ]},
                 {type: "category", id: "birthday", name: ru ? "ДЕНЬ РОЖДЕНИЯ" : "BIRTHDAY", shown: true, settings: [
                     {type: "custom", id: "birthdayDate", name: ru ? "Дата рождения" : "Birthday date", note: ru ? "Год не нужен. 29 февраля отмечается 28 февраля в невисокосный год." : "No year needed. February 29 moves to February 28 in non-leap years.", inline: false, children: React.createElement(DatePicker)},
