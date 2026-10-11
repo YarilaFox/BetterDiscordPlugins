@@ -2,10 +2,11 @@
  * @name SeasonalMoments
  * @author YarilaFox
  * @description Seasonal particles, winter snow, fireworks, and private holiday cards in chats and calls.
- * @version 0.8.0
+ * @version 0.8.1
  * @authorLink https://canary.discord.com/channels/@me/657887591634305036
  * @website https://github.com/YarilaFox/BetterDiscordPlugins/tree/main/SeasonalMoments
  * @source https://github.com/YarilaFox/BetterDiscordPlugins/blob/main/SeasonalMoments/SeasonalMoments.plugin.js
+ * @AI_assistance I used AI to generate valid CSS and optimise the plugin (I honestly don’t know how it optimised it, but it works); for the SVGs, I used some ready-made ones and created a couple of my own.
  */
 
 /* The autumn leaf shape is MIT licensed: Diemen Design, LibreICONS.

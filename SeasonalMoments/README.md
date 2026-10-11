@@ -18,6 +18,10 @@ BetterDiscord's plugin settings let you choose Auto, a season, rain, thunderstor
 
 The plugin follows Discord's language setting for its interface text. Russian and English are supported; other languages use English.
 
+## Development and artwork
+
+I used AI to generate valid CSS and optimise the plugin (I honestly don’t know how it optimised it, but it works); for the SVGs, I used some ready-made ones and created a couple of my own.
+
 ## Installation
 
 Copy [SeasonalMoments.plugin.js](./SeasonalMoments.plugin.js) to `%appdata%\BetterDiscord\plugins`, then enable **SeasonalMoments** in BetterDiscord's plugin settings. 
